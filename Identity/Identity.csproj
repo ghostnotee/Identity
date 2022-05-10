@@ -20,4 +20,11 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\SignUp\Controllers" />
+    <Folder Include="Areas\SignUp\Data" />
+    <Folder Include="Areas\SignUp\Models" />
+    <Folder Include="Areas\SignUp\Views" />
+  </ItemGroup>
+
 </Project>
