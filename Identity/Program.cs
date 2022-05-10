@@ -14,7 +14,7 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 });
 
 // Add Identity
-builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<AppIdentityDbContext>(); 
+builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
 
 var app = builder.Build();
 
