@@ -1,6 +1,5 @@
 using Identity.CustomValidation;
 using Identity.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +11,22 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerExpress"));
+});
+
+//Adding cookie
+CookieBuilder cookieBuilder = new();
+cookieBuilder.Name = "MySite";
+cookieBuilder.HttpOnly = true;
+cookieBuilder.Expiration = TimeSpan.FromDays(60);
+cookieBuilder.SameSite = SameSiteMode.Lax;
+cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = new PathString("/Home/Login");
+    options.Cookie = cookieBuilder;
+    options.SlidingExpiration = true;
+    //options.LogoutPath= new PathString("");
 });
 
 // Add Identity
