@@ -1,3 +1,4 @@
+using Identity.CustomValidation;
 using Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,17 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 });
 
 // Add Identity
-builder.Services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppIdentityDbContext>();
+builder.Services.AddIdentity<AppUser, AppRole>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+        options.Password.RequiredLength = 4;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireDigit = false;
+    }).AddPasswordValidator<CustomPasswordValidator>().AddUserValidator<CustomUserValidator>()
+    .AddErrorDescriber<CustomIdentityErrorDescriber>()
+    .AddEntityFrameworkStores<AppIdentityDbContext>();
 
 var app = builder.Build();
 
