@@ -24,6 +24,7 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
         options.Password.RequireUppercase = false;
         options.Password.RequireDigit = false;
     }).AddPasswordValidator<CustomPasswordValidator>().AddUserValidator<CustomUserValidator>()
+    .AddErrorDescriber<CustomIdentityErrorDescriber>()
     .AddEntityFrameworkStores<AppIdentityDbContext>();
 
 var app = builder.Build();
