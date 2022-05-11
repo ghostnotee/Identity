@@ -16,13 +16,15 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 
 // Add Identity
 builder.Services.AddIdentity<AppUser, AppRole>(options =>
-{
-    options.Password.RequiredLength = 4;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireDigit = false;
-}).AddPasswordValidator<CustomPasswordValidator>().AddEntityFrameworkStores<AppIdentityDbContext>();
+    {
+        options.User.RequireUniqueEmail = true;
+        options.Password.RequiredLength = 4;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireDigit = false;
+    }).AddPasswordValidator<CustomPasswordValidator>().AddUserValidator<CustomUserValidator>()
+    .AddEntityFrameworkStores<AppIdentityDbContext>();
 
 var app = builder.Build();
 

@@ -9,14 +9,17 @@ public class CustomPasswordValidator : IPasswordValidator<AppUser>
     {
         List<IdentityError> errors = new List<IdentityError>();
         if (password.ToLower().Contains(user.UserName.ToLower()))
-            errors.Add(new IdentityError()
-                { Code = "PasswordContainsUserName", Description = "Şifre alanı kullanıcı adı içeremez" });
+        {
+            if (!user.Email.Contains(user.UserName))
+                errors.Add(new IdentityError()
+                    { Code = "PasswordContainsUserName", Description = "Şifre alanı kullanıcı adını içeremez.." });
+        }
 
         if (password.ToLower().Contains("1234"))
             errors.Add(new IdentityError()
                 { Code = "PasswordContains", Description = "Şifre alanı ardışık sayı içeremez" });
-        
-        if(password.ToLower().Contains(user.Email.ToLower()))
+
+        if (password.ToLower().Contains(user.Email.ToLower()))
             errors.Add(new IdentityError()
                 { Code = "PasswordContainsEmail", Description = "Şifre alanı email adresi ile aynı olamaz" });
 
