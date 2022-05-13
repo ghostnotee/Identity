@@ -14,4 +14,6 @@ public class LoginViewModel
     [DataType(DataType.Password)]
     [MinLength(4, ErrorMessage = "En az 4 karakter olmalıdır")]
     public string Password { get; set; }
+
+    public bool RememberMe { get; set; }
 }

@@ -24,8 +24,10 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult LogIn()
+    public IActionResult LogIn(string ReturnUrl)
     {
+        TempData["ReturnUrl"] = ReturnUrl;
+
         return View();
     }
 
@@ -39,21 +41,24 @@ public class HomeController : Controller
             if (user != null)
             {
                 await _signInManager.SignOutAsync();
-                var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, false, false);
+                var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password,
+                    loginViewModel.RememberMe, false);
 
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Member");
+                    if (TempData["ReturnUrl"] != null)
+                        return Redirect(TempData["ReturnUrl"].ToString());
+
+                    return RedirectToAction("Index", "Member"); 
                 }
             }
             else
             {
-                ModelState.AddModelError("","Geçersiz email adresi veya şifresi");
+                ModelState.AddModelError("", "Geçersiz email adresi veya şifresi");
             }
-            
         }
 
-        return View();
+        return View(loginViewModel);
     }
 
     public IActionResult SignUp()

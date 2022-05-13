@@ -13,23 +13,6 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerExpress"));
 });
 
-//Adding cookie
-CookieBuilder cookieBuilder = new();
-cookieBuilder.Name = "MySite";
-cookieBuilder.HttpOnly = true;
-//cookieBuilder.Expiration = TimeSpan.FromDays(60);
-cookieBuilder.SameSite = SameSiteMode.Lax;
-cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = new PathString("/Home/Login");
-    options.Cookie = cookieBuilder;
-    options.SlidingExpiration = true;
-    options.ExpireTimeSpan = TimeSpan.FromDays(60);
-    //options.LogoutPath= new PathString("");
-});
-
 // Add Identity
 builder.Services.AddIdentity<AppUser, AppRole>(options =>
     {
@@ -42,6 +25,22 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
     }).AddPasswordValidator<CustomPasswordValidator>().AddUserValidator<CustomUserValidator>()
     .AddErrorDescriber<CustomIdentityErrorDescriber>()
     .AddEntityFrameworkStores<AppIdentityDbContext>();
+
+//Adding cookie
+CookieBuilder cookieBuilder = new();
+cookieBuilder.Name = "MySite";
+cookieBuilder.HttpOnly = false;
+cookieBuilder.SameSite = SameSiteMode.Lax;
+cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = new PathString("/Home/Login");
+    options.Cookie = cookieBuilder;
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(60);
+    //options.LogoutPath= new PathString("");
+});
 
 var app = builder.Build();
 
@@ -58,9 +57,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
-app.UseAuthentication();
 
 app.MapControllerRoute(
     name: "default",
