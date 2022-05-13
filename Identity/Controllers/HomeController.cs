@@ -9,11 +9,14 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly UserManager<AppUser> _userManager;
+    private readonly SignInManager<AppUser> _signInManager;
 
-    public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager)
+    public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager)
     {
         _logger = logger;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public IActionResult Index()
@@ -23,6 +26,33 @@ public class HomeController : Controller
 
     public IActionResult LogIn()
     {
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> LogIn(LoginViewModel loginViewModel)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+
+            if (user != null)
+            {
+                await _signInManager.SignOutAsync();
+                var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password, false, false);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", "Member");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("","Geçersiz email adresi veya şifresi");
+            }
+            
+        }
+
         return View();
     }
 

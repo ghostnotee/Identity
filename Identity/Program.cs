@@ -17,7 +17,7 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 CookieBuilder cookieBuilder = new();
 cookieBuilder.Name = "MySite";
 cookieBuilder.HttpOnly = true;
-cookieBuilder.Expiration = TimeSpan.FromDays(60);
+//cookieBuilder.Expiration = TimeSpan.FromDays(60);
 cookieBuilder.SameSite = SameSiteMode.Lax;
 cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 
@@ -26,6 +26,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LoginPath = new PathString("/Home/Login");
     options.Cookie = cookieBuilder;
     options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(60);
     //options.LogoutPath= new PathString("");
 });
 
