@@ -9,11 +9,14 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly UserManager<AppUser> _userManager;
+    private readonly SignInManager<AppUser> _signInManager;
 
-    public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager)
+    public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager)
     {
         _logger = logger;
         _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     public IActionResult Index()
@@ -21,9 +24,65 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult LogIn()
+    public IActionResult LogIn(string ReturnUrl)
     {
+        TempData["ReturnUrl"] = ReturnUrl;
+
         return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> LogIn(LoginViewModel loginViewModel)
+    {
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByEmailAsync(loginViewModel.Email);
+
+            if (user != null)
+            {
+                if (await _userManager.IsLockedOutAsync(user))
+                {
+                    ModelState.AddModelError("", "Hesabınız kilitlidir, Daha sonra tekrar deneyin");
+                    return View(loginViewModel);
+                }
+
+                await _signInManager.SignOutAsync();
+                var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password,
+                    loginViewModel.RememberMe, false);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.ResetAccessFailedCountAsync(user);
+
+                    if (TempData["ReturnUrl"] != null)
+                        return Redirect(TempData["ReturnUrl"].ToString());
+
+                    return RedirectToAction("Index", "Member");
+                }
+                else
+                {
+                    await _userManager.AccessFailedAsync(user);
+
+                    var failCount = await _userManager.GetAccessFailedCountAsync(user);
+                    if (failCount == 3)
+                    {
+                        await _userManager.SetLockoutEndDateAsync(user,
+                            new DateTimeOffset(DateTime.Now.AddMinutes(20)));
+                        ModelState.AddModelError("", "Hesabınız kilitlenmiştir");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Geçersiz email adresi veya şifresi");
+                    }
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Geçersiz email adresi veya şifresi");
+            }
+        }
+
+        return View(loginViewModel);
     }
 
     public IActionResult SignUp()

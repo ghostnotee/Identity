@@ -1,6 +1,5 @@
 using Identity.CustomValidation;
 using Identity.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +26,22 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
     .AddErrorDescriber<CustomIdentityErrorDescriber>()
     .AddEntityFrameworkStores<AppIdentityDbContext>();
 
+//Adding cookie
+CookieBuilder cookieBuilder = new();
+cookieBuilder.Name = "MySite";
+cookieBuilder.HttpOnly = false;
+cookieBuilder.SameSite = SameSiteMode.Lax;
+cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = new PathString("/Home/Login");
+    options.Cookie = cookieBuilder;
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromDays(60);
+    //options.LogoutPath= new PathString("");
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -42,9 +57,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
-app.UseAuthentication();
 
 app.MapControllerRoute(
     name: "default",
