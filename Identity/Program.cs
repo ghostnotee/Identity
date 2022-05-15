@@ -1,5 +1,6 @@
 using Identity.CustomValidation;
 using Identity.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +25,7 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
         options.Password.RequireDigit = false;
     }).AddPasswordValidator<CustomPasswordValidator>().AddUserValidator<CustomUserValidator>()
     .AddErrorDescriber<CustomIdentityErrorDescriber>()
-    .AddEntityFrameworkStores<AppIdentityDbContext>();
+    .AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
 
 //Adding cookie
 CookieBuilder cookieBuilder = new();

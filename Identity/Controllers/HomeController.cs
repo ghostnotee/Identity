@@ -129,10 +129,21 @@ public class HomeController : Controller
         if (user is not null)
         {
             string passwordResetToken = _userManager.GeneratePasswordResetTokenAsync(user).Result;
-            
+            var passwordResetLink = Url.Action("ResetPasswordConfirm", "Home", new
+            {
+                userId = user.Id,
+                token = passwordResetToken
+            }, HttpContext.Request.Scheme);
+            Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink);
+            ViewBag.status = "successfull";
+        }
+        else
+        {
+            ModelState.AddModelError("", "Sistemde kayıtlı email adresi bulunamadı");
         }
 
-        return View();
+
+        return View(passwordResetViewModel);
     }
 
     public IActionResult Privacy()
