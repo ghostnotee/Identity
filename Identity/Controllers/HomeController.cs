@@ -117,6 +117,35 @@ public class HomeController : Controller
         return View(userViewModel);
     }
 
+    public IActionResult ResetPassword()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult ResetPassword(PasswordResetViewModel passwordResetViewModel)
+    {
+        var user = _userManager.FindByEmailAsync(passwordResetViewModel.Email).Result;
+        if (user is not null)
+        {
+            string passwordResetToken = _userManager.GeneratePasswordResetTokenAsync(user).Result;
+            var passwordResetLink = Url.Action("ResetPasswordConfirm", "Home", new
+            {
+                userId = user.Id,
+                token = passwordResetToken
+            }, HttpContext.Request.Scheme);
+            Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink);
+            ViewBag.status = "successfull";
+        }
+        else
+        {
+            ModelState.AddModelError("", "Sistemde kayıtlı email adresi bulunamadı");
+        }
+
+
+        return View(passwordResetViewModel);
+    }
+
     public IActionResult Privacy()
     {
         return View();
