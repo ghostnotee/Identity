@@ -12,7 +12,7 @@ public static class PasswordReset
         mail.From = new MailAddress("selbilgen@gmail.com");
         mail.To.Add("selbilgen@gmail.com");
 
-        mail.Subject = $"www.bıdıbı.com::Şifre sıfırlama";
+        mail.Subject = $"www.mysite.com::Şifre sıfırlama";
         mail.Body = "<h2>Şifrenizi yenilemek için lütfen aşağıdaki linke tıklayınız.</h2><hr/>";
         mail.Body += $"<a href='{link}'>şifre yenileme linki</a>";
         mail.IsBodyHtml = true;
