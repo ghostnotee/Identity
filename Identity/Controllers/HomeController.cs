@@ -146,6 +146,48 @@ public class HomeController : Controller
         return View(passwordResetViewModel);
     }
 
+    public IActionResult ResetPasswordConfirm(string userId, string token)
+    {
+        TempData["userId"] = userId;
+        TempData["token"] = token;
+
+        return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ResetPasswordConfirm(
+        [Bind("PasswordNew")] PasswordResetViewModel passwordResetViewModel)
+    {
+        var token = TempData["token"]?.ToString();
+        var userId = TempData["userId"]?.ToString();
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is not null)
+        {
+            var result = await _userManager.ResetPasswordAsync(user, token, passwordResetViewModel.PasswordNew);
+
+            if (result.Succeeded)
+            {
+                await _userManager.UpdateSecurityStampAsync(user);
+                TempData["passwordResetInfo"] = "Şifre yenilenmiştir.";
+                ViewBag.status = "success";
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+            }
+        }
+        else
+        {
+            ModelState.AddModelError("", "Kullanıcı bulunamadı.");
+        }
+
+        return View();
+    }
+
     public IActionResult Privacy()
     {
         return View();
