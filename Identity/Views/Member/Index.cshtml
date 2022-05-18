@@ -1,8 +1,29 @@
-@model dynamic
+@model UserViewModel
 
 @{
     ViewBag.Title = "title";
-    Layout = "_Layout";
+    Layout = "_MemberLayout";
 }
 
-<h2>Index</h2>
+<h3 class="text-center">Kullanıcı Bilgileri</h3>
+<div class="row">
+    <div class="col-sm-3">
+        <img style="width: 100%; height: 100%" src="UserPicture/2522623_414x414.jpeg"/>
+    </div>
+    <div class="col-sm-9">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>Kullanıcı İsmi</th>
+                <td>@Model.UserName</td>
+            </tr>
+            <tr>
+                <th>E-posta</th>
+                <td>@Model.Email</td>
+            </tr>
+            <tr>
+                <th>Telefon No</th>
+                <td>@Model.PhoneNumber</td>
+            </tr>
+        </table>
+    </div>
+</div>
