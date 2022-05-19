@@ -115,9 +115,8 @@ public class MemberController : Controller
         return View(userViewModel);
     }
 
-
-    public IActionResult Logout()
+    public void Logout()
     {
-        return View();
+        _signInManager.SignOutAsync();
     }
 }
