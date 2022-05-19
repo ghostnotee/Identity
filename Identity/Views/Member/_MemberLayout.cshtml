@@ -20,31 +20,27 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Member" asp-action="Index">Üye Sayfası</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Member" asp-action="Index">Üye Anasayfa</a>
                     </li>
                 </ul>
-
             </div>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="SignUp">Üye Ol</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Giriş Yap</a>
-                </li>
-            </ul>
         </div>
     </nav>
 </header>
 <div class="container">
     <main role="main" class="pb-3">
-        @RenderBody()
+        <div class="row">
+            <div class="col-md-8">
+                @RenderBody()
+            </div>
+            <div class="col-md-4">
+                <h3>Menü</h3>
+                <a class="btn btn-info" asp-action="PasswordChange" asp-controller="Member">Şifre Değiştirme</a>
+                <a class="btn btn-info" asp-action="UserEdit" asp-controller="Member">User Günceleme</a>
+                <a class="btn btn-info" asp-action="Logout" asp-controller="Member" asp-route-returnUrl="/Home/Index">Çıkış yap</a>
+            </div>
+        </div>
+
     </main>
 </div>
 

@@ -37,6 +37,7 @@ cookieBuilder.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = new PathString("/Home/Login");
+    options.LogoutPath = new PathString("/Member/Logout");
     options.Cookie = cookieBuilder;
     options.SlidingExpiration = true;
     options.ExpireTimeSpan = TimeSpan.FromDays(60);
