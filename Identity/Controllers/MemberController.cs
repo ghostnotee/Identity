@@ -51,10 +51,10 @@ public class MemberController : Controller
                 if (result.Succeeded)
                 {
                     _userManager.UpdateSecurityStampAsync(user);
-                    
+
                     _signInManager.SignOutAsync();
                     _signInManager.PasswordSignInAsync(user, passwordChangeViewModel.PasswordNew, true, false);
-                    
+
                     ViewBag.success = true;
                 }
                 else
@@ -77,7 +77,42 @@ public class MemberController : Controller
 
     public IActionResult UserEdit()
     {
-        return View();
+        var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+        var userViewModel = user.Adapt<UserViewModel>();
+
+        return View(userViewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UserEdit(UserViewModel userViewModel)
+    {
+        ModelState.Remove("Password");
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            user.UserName = userViewModel.UserName;
+            user.Email = userViewModel.Email;
+            user.PhoneNumber = userViewModel.PhoneNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                await _userManager.UpdateSecurityStampAsync(user);
+                await _signInManager.SignOutAsync();
+                await _signInManager.SignInAsync(user, true);
+                ViewBag.success = "true";
+            }
+            else
+            {
+                foreach (var identityError in result.Errors)
+                {
+                    ModelState.AddModelError("", identityError.Description);
+                }
+            }
+        }
+
+        return View(userViewModel);
     }
 
 
