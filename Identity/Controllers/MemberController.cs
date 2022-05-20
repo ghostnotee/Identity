@@ -10,23 +10,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace Identity.Controllers;
 
 [Authorize]
-public class MemberController : Controller
+public class MemberController : BaseController
 {
-    private readonly ILogger<HomeController> _logger;
-    private readonly UserManager<AppUser> _userManager;
-    private readonly SignInManager<AppUser> _signInManager;
-
     public MemberController(ILogger<HomeController> logger, UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager)
+        SignInManager<AppUser> signInManager) : base(logger, userManager, signInManager)
     {
-        _logger = logger;
-        _userManager = userManager;
-        _signInManager = signInManager;
     }
 
     public IActionResult Index()
     {
-        var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+        var user = CurrentUser;
         UserViewModel userViewModel = user.Adapt<UserViewModel>();
 
 
@@ -43,7 +36,7 @@ public class MemberController : Controller
     {
         if (ModelState.IsValid)
         {
-            var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+            var user = CurrentUser;
 
             bool exist = _userManager.CheckPasswordAsync(user, passwordChangeViewModel.PasswordOld).Result;
             if (exist)
@@ -61,10 +54,7 @@ public class MemberController : Controller
                 }
                 else
                 {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
+                    AddModelError(result);
                 }
             }
             else
@@ -79,7 +69,7 @@ public class MemberController : Controller
 
     public IActionResult UserEdit()
     {
-        var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
+        var user = CurrentUser;
         var userViewModel = user.Adapt<UserViewModel>();
         ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
 
@@ -92,40 +82,37 @@ public class MemberController : Controller
         ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
         ModelState.Remove("Password");
         //if (ModelState.IsValid)
-       // {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            if (userPicture is { Length: > 0 })
-            {
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(userPicture.FileName);
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserPicture", fileName);
-                await using var stream = new FileStream(path, FileMode.Create);
-                await userPicture.CopyToAsync(stream);
-                user.Picture = "UserPicture/" + fileName;
-            }
+        // {
+        var user = CurrentUser;
+        if (userPicture is { Length: > 0 })
+        {
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(userPicture.FileName);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserPicture", fileName);
+            await using var stream = new FileStream(path, FileMode.Create);
+            await userPicture.CopyToAsync(stream);
+            user.Picture = "UserPicture/" + fileName;
+        }
 
-            user.UserName = userViewModel.UserName;
-            user.Email = userViewModel.Email;
-            user.PhoneNumber = userViewModel.PhoneNumber;
-            user.City = userViewModel.City;
-            user.BirthDay = userViewModel.BirthDay;
-            user.Gender = (ushort)userViewModel.Gender;
+        user.UserName = userViewModel.UserName;
+        user.Email = userViewModel.Email;
+        user.PhoneNumber = userViewModel.PhoneNumber;
+        user.City = userViewModel.City;
+        user.BirthDay = userViewModel.BirthDay;
+        user.Gender = (ushort)userViewModel.Gender;
 
-            var result = await _userManager.UpdateAsync(user);
+        var result = await _userManager.UpdateAsync(user);
 
-            if (result.Succeeded)
-            {
-                await _userManager.UpdateSecurityStampAsync(user);
-                await _signInManager.SignOutAsync();
-                await _signInManager.SignInAsync(user, true);
-                ViewBag.success = "true";
-            }
-            else
-            {
-                foreach (var identityError in result.Errors)
-                {
-                    ModelState.AddModelError("", identityError.Description);
-                }
-            }
+        if (result.Succeeded)
+        {
+            await _userManager.UpdateSecurityStampAsync(user);
+            await _signInManager.SignOutAsync();
+            await _signInManager.SignInAsync(user, true);
+            ViewBag.success = "true";
+        }
+        else
+        {
+           AddModelError(result);
+        }
         //}
 
         return View(userViewModel);
