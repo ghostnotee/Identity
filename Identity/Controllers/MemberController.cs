@@ -1,9 +1,11 @@
+using Identity.Enums;
 using Identity.Models;
 using Identity.Models.ViewModels;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Identity.Controllers;
 
@@ -79,20 +81,34 @@ public class MemberController : Controller
     {
         var user = _userManager.FindByNameAsync(User.Identity.Name).Result;
         var userViewModel = user.Adapt<UserViewModel>();
+        ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
 
         return View(userViewModel);
     }
 
     [HttpPost]
-    public async Task<IActionResult> UserEdit(UserViewModel userViewModel)
+    public async Task<IActionResult> UserEdit(UserViewModel userViewModel, IFormFile userPicture)
     {
+        ViewBag.Gender = new SelectList(Enum.GetNames(typeof(Gender)));
         ModelState.Remove("Password");
-        if (ModelState.IsValid)
-        {
+        //if (ModelState.IsValid)
+       // {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
+            if (userPicture is { Length: > 0 })
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(userPicture.FileName);
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/UserPicture", fileName);
+                await using var stream = new FileStream(path, FileMode.Create);
+                await userPicture.CopyToAsync(stream);
+                user.Picture = "UserPicture/" + fileName;
+            }
+
             user.UserName = userViewModel.UserName;
             user.Email = userViewModel.Email;
             user.PhoneNumber = userViewModel.PhoneNumber;
+            user.City = userViewModel.City;
+            user.BirthDay = userViewModel.BirthDay;
+            user.Gender = (ushort)userViewModel.Gender;
 
             var result = await _userManager.UpdateAsync(user);
 
@@ -110,7 +126,7 @@ public class MemberController : Controller
                     ModelState.AddModelError("", identityError.Description);
                 }
             }
-        }
+        //}
 
         return View(userViewModel);
     }

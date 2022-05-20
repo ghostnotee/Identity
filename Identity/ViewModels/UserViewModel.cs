@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Identity.Enums;
 
 namespace Identity.Models.ViewModels;
 
@@ -19,4 +20,9 @@ public class UserViewModel
     [Display(Name = "Şifre alanı")]
     [DataType(DataType.Password)]
     public string Password { get; set; }
+
+    public DateTime BirthDay { get; set; }
+    public string Picture { get; set; }
+    public string City { get; set; }
+    public Gender Gender { get; set; }
 }
