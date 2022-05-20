@@ -5,27 +5,20 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
-    private readonly ILogger<HomeController> _logger;
-    private readonly UserManager<AppUser> _userManager;
-    private readonly SignInManager<AppUser> _signInManager;
-
     public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager)
+        SignInManager<AppUser> signInManager) : base(logger, userManager, signInManager)
     {
-        _logger = logger;
-        _userManager = userManager;
-        _signInManager = signInManager;
     }
 
     public IActionResult Index()
     {
         if (User.Identity.IsAuthenticated)
         {
-           return RedirectToAction("Index", "Member");
+            return RedirectToAction("Index", "Member");
         }
-        
+
         return View();
     }
 
@@ -112,10 +105,7 @@ public class HomeController : Controller
             }
             else
             {
-                foreach (var item in result.Errors)
-                {
-                    ModelState.AddModelError("", item.Description);
-                }
+                AddModelError(result);
             }
         }
 
@@ -179,10 +169,7 @@ public class HomeController : Controller
             }
             else
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
+                AddModelError(result);
             }
         }
         else
