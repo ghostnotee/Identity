@@ -8,7 +8,7 @@ namespace Identity.Controllers;
 public class HomeController : BaseController
 {
     public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager) : base(logger, userManager, signInManager)
+        SignInManager<AppUser> signInManager) : base(userManager, signInManager)
     {
     }
 

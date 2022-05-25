@@ -10,9 +10,9 @@
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-white border-bottom box-shadow mb-3">
         <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Identity</a>
+            <a class="navbar-brand" asp-area="" asp-controller="Admin" asp-action="Index">Anmin Anasayfa</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -20,10 +20,7 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Member" asp-action="Index">Üye Anasayfa</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-info text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin  Anasayfa</a>
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Index">Admin Anasayfa</a>
                     </li>
                 </ul>
             </div>
@@ -38,9 +35,9 @@
             </div>
             <div class="col-md-4">
                 <h3>Menü</h3>
-                <a class="btn btn-info" asp-action="PasswordChange" asp-controller="Member">Şifre Değiştirme</a>
-                <a class="btn btn-info" asp-action="UserEdit" asp-controller="Member">User Günceleme</a>
-                <a class="btn btn-info" asp-action="Logout" asp-controller="Member" asp-route-returnUrl="/Home/Index">Çıkış yap</a>
+                <a class="btn btn-danger" asp-action="Users" asp-controller="Admin">Üyeler</a>
+                <a class="btn btn-danger" asp-action="Roles" asp-controller="Admin">Roller</a>
+                <a class="btn btn-danger" asp-action="Logout" asp-controller="Member" asp-route-returnUrl="/Home/Index">Çıkış yap</a>
             </div>
         </div>
 
