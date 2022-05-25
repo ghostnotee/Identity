@@ -1,5 +1,6 @@
 using Identity.Models;
 using Identity.Models.ViewModels;
+using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -68,7 +69,40 @@ namespace Identity.Controllers
 
         public IActionResult RoleUpdate(string id)
         {
-            return View("Roles");
+            var role = _roleManager.FindByIdAsync(id).Result;
+
+            if (role is null)
+            {
+                return RedirectToAction("Roles");
+            }
+
+            return View(role.Adapt<RoleViewModel>());
+        }
+
+        [HttpPost]
+        public IActionResult RoleUpdate(RoleViewModel roleViewModel)
+        {
+            var role = _roleManager.FindByIdAsync(roleViewModel.Id).Result;
+
+            if (role is not null)
+            {
+                role.Name = roleViewModel.Name;
+                var result = _roleManager.UpdateAsync(role).Result;
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Roles");
+                }
+                else
+                {
+                    AddModelError(result);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "Güncelleme işlemi başarısız");
+            }
+
+            return View(roleViewModel);
         }
     }
 }
