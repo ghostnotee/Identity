@@ -12,8 +12,8 @@ namespace Identity.Controllers;
 [Authorize]
 public class MemberController : BaseController
 {
-    public MemberController(ILogger<HomeController> logger, UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager) : base(logger, userManager, signInManager)
+    public MemberController(UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager) : base(userManager, signInManager)
     {
     }
 
@@ -121,5 +121,10 @@ public class MemberController : BaseController
     public void Logout()
     {
         _signInManager.SignOutAsync();
+    }
+
+    public IActionResult AccessDenied()
+    {
+        return View();
     }
 }
