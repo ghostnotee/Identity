@@ -1,4 +1,5 @@
 using Identity.Models;
+using Identity.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,9 +17,58 @@ namespace Identity.Controllers
             return View();
         }
 
+        public IActionResult Roles()
+        {
+            return View(_roleManager.Roles.ToList());
+        }
+
+
+        public IActionResult RoleCreate()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult RoleCreate(RoleViewModel roleViewModel)
+        {
+            var role = new AppRole() { Name = roleViewModel.Name };
+            var result = _roleManager.CreateAsync(role).Result;
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Roles");
+            }
+            else
+            {
+                AddModelError(result);
+            }
+
+            return View(roleViewModel);
+        }
+
         public IActionResult Users()
         {
             return View(_userManager.Users);
+        }
+
+        public IActionResult RoleDelete(string id)
+        {
+            var role = _roleManager.FindByIdAsync(id).Result;
+            if (role is not null)
+            {
+                var result = _roleManager.DeleteAsync(role).Result;
+            }
+            else
+            {
+                ViewBag.error = "Role ismi bulunamadı";
+            }
+
+            return RedirectToAction("Roles");
+        }
+
+        public IActionResult RoleUpdate(string id)
+        {
+            return View("Roles");
         }
     }
 }
