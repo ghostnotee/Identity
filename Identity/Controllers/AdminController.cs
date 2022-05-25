@@ -50,5 +50,25 @@ namespace Identity.Controllers
         {
             return View(_userManager.Users);
         }
+
+        public IActionResult RoleDelete(string id)
+        {
+            var role = _roleManager.FindByIdAsync(id).Result;
+            if (role is not null)
+            {
+                var result = _roleManager.DeleteAsync(role).Result;
+            }
+            else
+            {
+                ViewBag.error = "Role ismi bulunamadı";
+            }
+
+            return RedirectToAction("Roles");
+        }
+
+        public IActionResult RoleUpdate(string id)
+        {
+            return View("Roles");
+        }
     }
 }
