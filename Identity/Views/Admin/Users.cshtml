@@ -12,6 +12,7 @@
         <td>User Id</td>
         <td>User Name</td>
         <td>Email</td>
+        <td>Role Atama</td>
     </tr>
     @if (!Model.Any())
     {
@@ -27,6 +28,9 @@
                 <td>@item.Id</td>
                 <td>@item.UserName</td>
                 <td>@item.Email</td>
+                <td>
+                    <a class="btn btn-success" asp-action="RoleAssign" asp-route-id="@item.Id">Rol Ata</a>
+                </td>
             </tr>
         }
     }
