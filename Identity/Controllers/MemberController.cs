@@ -111,7 +111,7 @@ public class MemberController : BaseController
         }
         else
         {
-           AddModelError(result);
+            AddModelError(result);
         }
         //}
 
@@ -133,9 +133,15 @@ public class MemberController : BaseController
     {
         return View();
     }
-    
+
     [Authorize(Roles = "Manager,Admin")]
     public IActionResult Manager()
+    {
+        return View();
+    }
+
+    [Authorize(Policy = "KutahyaPolicy")]
+    public IActionResult KutahyaPage()
     {
         return View();
     }

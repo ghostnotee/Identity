@@ -1,5 +1,7 @@
+using Identity.ClaimProvider;
 using Identity.CustomValidation;
 using Identity.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,6 +45,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(60);
     options.AccessDeniedPath = new PathString("/Member/AccessDenied");
     //options.LogoutPath= new PathString("");
+});
+
+builder.Services.AddScoped<IClaimsTransformation, ClaimProvider>();
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("KutahyaPolicy", policy => { policy.RequireClaim("city", "Kütahya"); });
 });
 
 var app = builder.Build();
