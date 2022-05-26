@@ -22,7 +22,7 @@ public class UserRoleNames : TagHelper
         var roles = await UserManager.GetRolesAsync(user);
 
         var html = string.Empty;
-        roles.ToList().ForEach(x => { html += $"<span class='badge badge-alert-success'> {x}  </span>"; });
+        roles.ToList().ForEach(x => { html += $"<span class='badge bg-info text-dark'> {x}  </span>"; });
 
         output.Content.SetHtmlContent(html);
     }
