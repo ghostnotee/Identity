@@ -7,7 +7,7 @@ namespace Identity.Controllers;
 
 public class HomeController : BaseController
 {
-    public HomeController(ILogger<HomeController> logger, UserManager<AppUser> userManager,
+    public HomeController(UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager) : base(userManager, signInManager)
     {
     }
@@ -91,23 +91,21 @@ public class HomeController : BaseController
     [HttpPost]
     public async Task<IActionResult> SignUp(UserViewModel userViewModel)
     {
-        if (ModelState.IsValid)
-        {
-            AppUser user = new();
-            user.UserName = userViewModel.UserName;
-            user.Email = userViewModel.Email;
-            user.PhoneNumber = userViewModel.PhoneNumber;
+        AppUser user = new();
+        user.UserName = userViewModel.UserName;
+        user.Email = userViewModel.Email;
+        user.PhoneNumber = userViewModel.PhoneNumber;
 
-            IdentityResult result = await _userManager.CreateAsync(user, userViewModel.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("LogIn");
-            }
-            else
-            {
-                AddModelError(result);
-            }
+        IdentityResult result = await _userManager.CreateAsync(user, userViewModel.Password);
+        if (result.Succeeded)
+        {
+            return RedirectToAction("LogIn");
         }
+        else
+        {
+            AddModelError(result);
+        }
+
 
         return View(userViewModel);
     }
