@@ -145,4 +145,10 @@ public class MemberController : BaseController
     {
         return View();
     }
+    
+    [Authorize(Policy = "ViolencePolicy")]
+    public IActionResult ViolencePage()
+    {
+        return View();
+    }
 }

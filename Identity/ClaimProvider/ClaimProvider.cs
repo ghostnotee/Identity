@@ -24,12 +24,25 @@ public class ClaimProvider : IClaimsTransformation
 
             if (user is not null)
             {
+                if (user.BirthDay != null)
+                {
+                    var today = DateTime.Today;
+                    var age = today.Year - user.BirthDay?.Year;
+
+                    if (age > 15)
+                    {
+                        Claim violenceClaim =
+                            new Claim("violence", true.ToString(), ClaimValueTypes.String, "Internal");
+                        identity.AddClaim(violenceClaim);
+                    }
+                }
+
                 if (user.City is not null)
                 {
                     if (!principal.HasClaim(c => c.Type == "City"))
                     {
-                        Claim CityClaim = new Claim("city", user.City, ClaimValueTypes.String, "Internal");
-                        identity.AddClaim(CityClaim);
+                        Claim cityClaim = new Claim("city", user.City, ClaimValueTypes.String, "Internal");
+                        identity.AddClaim(cityClaim);
                     }
                 }
             }

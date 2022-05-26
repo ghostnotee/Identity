@@ -31,9 +31,6 @@
                     <li class="nav-item">
                         <a class="btn btn-info" asp-action="Manager" asp-controller="Member">Manager ana sayfa</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="btn btn-info" asp-action="KutahyaPage" asp-controller="Member">Kütahyalı Sayfası</a>
-                    </li>
                 </ul>
             </div>
         </div>
@@ -45,8 +42,10 @@
             <div class="col-md-8">
                 @RenderBody()
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 flex-md-column">
                 <h3>Menü</h3>
+                <a class="btn btn-info" asp-action="KutahyaPage" asp-controller="Member">Kütahyalı Sayfası</a>
+                <a class="btn btn-info" asp-action="ViolencePage" asp-controller="Member">Şiddet içerikli Alan</a>
                 <a class="btn btn-info" asp-action="PasswordChange" asp-controller="Member">Şifre Değiştirme</a>
                 <a class="btn btn-info" asp-action="UserEdit" asp-controller="Member">User Günceleme</a>
                 <a class="btn btn-info" asp-action="Logout" asp-controller="Member" asp-route-returnUrl="/Home/Index">Çıkış yap</a>

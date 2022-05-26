@@ -51,6 +51,7 @@ builder.Services.AddScoped<IClaimsTransformation, ClaimProvider>();
 builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy("KutahyaPolicy", policy => { policy.RequireClaim("city", "Kütahya"); });
+    opt.AddPolicy("ViolencePolicy", policy => { policy.RequireClaim("violence"); });
 });
 
 var app = builder.Build();
