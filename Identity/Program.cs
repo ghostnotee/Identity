@@ -2,6 +2,7 @@ using Identity.ClaimProvider;
 using Identity.CustomValidation;
 using Identity.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -47,11 +48,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     //options.LogoutPath= new PathString("");
 });
 
+builder.Services.AddTransient<IAuthorizationHandler, ExpireDateExchangeHandler>();
 builder.Services.AddScoped<IClaimsTransformation, ClaimProvider>();
 builder.Services.AddAuthorization(opt =>
 {
     opt.AddPolicy("KutahyaPolicy", policy => { policy.RequireClaim("city", "Kütahya"); });
     opt.AddPolicy("ViolencePolicy", policy => { policy.RequireClaim("violence"); });
+    opt.AddPolicy("ExchangePolicy", policy => { policy.AddRequirements(new Requirements()); });
 });
 
 var app = builder.Build();
