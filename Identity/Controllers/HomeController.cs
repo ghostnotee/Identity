@@ -127,7 +127,7 @@ public class HomeController : BaseController
                 userId = user.Id,
                 token = passwordResetToken
             }, HttpContext.Request.Scheme);
-            Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink);
+            Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink,passwordResetViewModel.Email);
             ViewBag.status = "successfull";
         }
         else

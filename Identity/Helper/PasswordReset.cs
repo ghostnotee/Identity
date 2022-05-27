@@ -4,13 +4,13 @@ namespace Identity.Helper;
 
 public static class PasswordReset
 {
-    public static void PasswordResetSendEmail(string link)
+    public static void PasswordResetSendEmail(string link, string email)
     {
         MailMessage mail = new();
         SmtpClient smtpClient = new SmtpClient("smtp.mailtrap.io");
 
         mail.From = new MailAddress("selbilgen@gmail.com");
-        mail.To.Add("selbilgen@gmail.com");
+        mail.To.Add(email);
 
         mail.Subject = $"www.mysite.com::Şifre sıfırlama";
         mail.Body = "<h2>Şifrenizi yenilemek için lütfen aşağıdaki linke tıklayınız.</h2><hr/>";
