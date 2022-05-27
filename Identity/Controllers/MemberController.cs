@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Identity.Enums;
 using Identity.Models;
 using Identity.Models.ViewModels;
@@ -111,7 +112,7 @@ public class MemberController : BaseController
         }
         else
         {
-           AddModelError(result);
+            AddModelError(result);
         }
         //}
 
@@ -123,20 +124,74 @@ public class MemberController : BaseController
         _signInManager.SignOutAsync();
     }
 
-    public IActionResult AccessDenied()
-    {
-        return View();
-    }
-
     [Authorize(Roles = "Editor,Admin")]
     public IActionResult Editor()
     {
         return View();
     }
-    
+
     [Authorize(Roles = "Manager,Admin")]
     public IActionResult Manager()
     {
+        return View();
+    }
+
+    [Authorize(Policy = "KutahyaPolicy")]
+    public IActionResult KutahyaPage()
+    {
+        return View();
+    }
+
+    [Authorize(Policy = "ViolencePolicy")]
+    public IActionResult ViolencePage()
+    {
+        return View();
+    }
+
+
+    public async Task<IActionResult> ExchangeRedirect()
+    {
+        bool result = User.HasClaim(x => x.Type == "ExpireDateExchange");
+        if (result is false)
+        {
+            Claim expireDateExchange =
+                new Claim("ExpireDateExchange", DateTime.Now.AddDays(30).Date.ToShortDateString(),
+                    ClaimValueTypes.String, "Internal");
+
+            await _userManager.AddClaimAsync(CurrentUser, expireDateExchange);
+            await _signInManager.SignOutAsync();
+            await _signInManager.SignInAsync(CurrentUser, true);
+        }
+
+        return RedirectToAction("Exchange");
+    }
+
+    [Authorize(Policy = "ExchangePolicy")]
+    public IActionResult Exchange()
+    {
+        return View();
+    }
+
+    public IActionResult AccessDenied(string returnUrl)
+    {
+        if (returnUrl.ToLower().Contains("violencepage"))
+        {
+            ViewBag.message =
+                "Erişmeye çalıştığınız sayfa şiddet videoları içerdiğinden dolayı 15 yaşında büyük olmanız gerekmektedir";
+        }
+        else if (returnUrl.ToLower().Contains("KutahyaPage"))
+        {
+            ViewBag.message = "Bu sayfayı sadece Kütahya'lılar görebilir";
+        }
+        else if (returnUrl.ToLower().Contains("exchange"))
+        {
+            ViewBag.message = "30 günlük ücretsiz deneme hakkınız sona ermiştir.";
+        }
+        else
+        {
+            ViewBag.message = "Bu sayfaya erişim izniniz yoktur. Erişim izni almak için site yöneticisiyle görüşünüz";
+        }
+
         return View();
     }
 }

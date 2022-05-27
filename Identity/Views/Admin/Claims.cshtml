@@ -1,0 +1,26 @@
+@model System.Collections.Generic.List<System.Security.Claims.Claim>
+
+@{
+    ViewBag.Title = "Claims";
+    Layout = "_AdminLayout";
+}
+
+<h2>Claims</h2>
+<hr/>
+<table class="table table-bordered table-striped table-responsive">
+    <tr>
+        <th>Name</th>
+        <th>Dağıtıcı</th>
+        <th>Adı</th>
+        <th>Değer</th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Subject.Name</td>
+            <td>@item.Issuer</td>
+            <td>@item.Type</td>
+            <td>@item.Value</td>
+        </tr>
+    }
+</table>

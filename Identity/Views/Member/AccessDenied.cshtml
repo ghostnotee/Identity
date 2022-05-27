@@ -1,8 +1,8 @@
-@model dynamic
-
 @{
-    ViewBag.Title = "AccessDenied";
-    Layout = "_Layout";
+    ViewData["Title"] = "AccessDenied";
+    Layout = "_MemberLayout.cshtml";
 }
 
-<h2>Bu sayfaya erişim izniniz yoktur. Admin ile irtibata geçiniz.</h2>
+<div class="alert alert-danger">
+    @ViewBag.message
+</div>

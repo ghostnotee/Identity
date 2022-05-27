@@ -44,6 +44,12 @@ public class HomeController : BaseController
                     return View(loginViewModel);
                 }
 
+                if (_userManager.IsEmailConfirmedAsync(user).Result is false)
+                {
+                    ModelState.AddModelError("","Email adresiniz doğrulanmamıştır. Emailinizi kontrol ediniz.");
+                    return View(loginViewModel);
+                }
+
                 await _signInManager.SignOutAsync();
                 var result = await _signInManager.PasswordSignInAsync(user, loginViewModel.Password,
                     loginViewModel.RememberMe, false);
@@ -99,6 +105,15 @@ public class HomeController : BaseController
         IdentityResult result = await _userManager.CreateAsync(user, userViewModel.Password);
         if (result.Succeeded)
         {
+            var confirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var link = Url.Action("ConfirmEmail", "Home", new
+            {
+                userId = user.Id,
+                token = confirmationToken
+            }, protocol: HttpContext.Request.Scheme);
+
+            Helper.EmailConfirmation.SendEmail(link, user.Email);
+
             return RedirectToAction("LogIn");
         }
         else
@@ -127,7 +142,7 @@ public class HomeController : BaseController
                 userId = user.Id,
                 token = passwordResetToken
             }, HttpContext.Request.Scheme);
-            Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink);
+            Helper.PasswordReset.PasswordResetSendEmail(passwordResetLink, passwordResetViewModel.Email);
             ViewBag.status = "successfull";
         }
         else
@@ -180,6 +195,23 @@ public class HomeController : BaseController
 
     public IActionResult Privacy()
     {
+        return View();
+    }
+
+    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+
+        IdentityResult result = await _userManager.ConfirmEmailAsync(user, token);
+        if (result.Succeeded)
+        {
+            ViewBag.status = "Email adresiniz onaylanmıştır.";
+        }
+        else
+        {
+            ViewBag.status = "Hata meydana geldi.";
+        }
+        
         return View();
     }
 }

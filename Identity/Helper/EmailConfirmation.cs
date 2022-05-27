@@ -2,9 +2,9 @@ using System.Net.Mail;
 
 namespace Identity.Helper;
 
-public static class PasswordReset
+public static class EmailConfirmation
 {
-    public static void PasswordResetSendEmail(string link, string email)
+    public static void SendEmail(string link, string email)
     {
         MailMessage mail = new();
         SmtpClient smtpClient = new SmtpClient("smtp.mailtrap.io");
@@ -12,9 +12,9 @@ public static class PasswordReset
         mail.From = new MailAddress("selbilgen@gmail.com");
         mail.To.Add(email);
 
-        mail.Subject = $"www.mysite.com::Şifre sıfırlama";
-        mail.Body = "<h2>Şifrenizi yenilemek için lütfen aşağıdaki linke tıklayınız.</h2><hr/>";
-        mail.Body += $"<a href='{link}'>şifre yenileme linki</a>";
+        mail.Subject = $"www.mysite.com. Email doğrulama";
+        mail.Body = "<h2>Email doğrulama için lütfen aşağıdaki linke tıklayınız.</h2><hr/>";
+        mail.Body += $"<a href='{link}'>Email doğrulama linki</a>";
         mail.IsBodyHtml = true;
         smtpClient.Port = 587;
         smtpClient.Credentials = new System.Net.NetworkCredential("6d4786debd1b24", "19f3164c9e9e64");
