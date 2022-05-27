@@ -123,11 +123,6 @@ public class MemberController : BaseController
         _signInManager.SignOutAsync();
     }
 
-    public IActionResult AccessDenied()
-    {
-        return View();
-    }
-
     [Authorize(Roles = "Editor,Admin")]
     public IActionResult Editor()
     {
@@ -149,6 +144,29 @@ public class MemberController : BaseController
     [Authorize(Policy = "ViolencePolicy")]
     public IActionResult ViolencePage()
     {
+        return View();
+    }
+    
+    
+    public IActionResult AccessDenied(string returnUrl)
+    {
+        if (returnUrl.ToLower().Contains("violencepage"))
+        {
+            ViewBag.message = "Erişmeye çalıştığınız sayfa şiddet videoları içerdiğinden dolayı 15 yaşında büyük olmanız gerekmektedir";
+        }
+        else if (returnUrl.ToLower().Contains("KutahyaPage"))
+        {
+            ViewBag.message = "Bu sayfayı sadece Kütahya'lılar görebilir";
+        }
+        else if (returnUrl.ToLower().Contains("exchange"))
+        {
+            ViewBag.message = "30 günlük ücretsiz deneme hakkınız sona ermiştir.";
+        }
+        else
+        {
+            ViewBag.message = "Bu sayfaya erişim izniniz yoktur. Erişim izni almak için site yöneticisiyle görüşünüz";
+        }
+
         return View();
     }
 }
