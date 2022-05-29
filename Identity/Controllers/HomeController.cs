@@ -1,4 +1,5 @@
-﻿using Identity.Models;
+﻿using System.Security.Claims;
+using Identity.Models;
 using Microsoft.AspNetCore.Mvc;
 using Identity.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -46,7 +47,7 @@ public class HomeController : BaseController
 
                 if (_userManager.IsEmailConfirmedAsync(user).Result is false)
                 {
-                    ModelState.AddModelError("","Email adresiniz doğrulanmamıştır. Emailinizi kontrol ediniz.");
+                    ModelState.AddModelError("", "Email adresiniz doğrulanmamıştır. Emailinizi kontrol ediniz.");
                     return View(loginViewModel);
                 }
 
@@ -211,7 +212,105 @@ public class HomeController : BaseController
         {
             ViewBag.status = "Hata meydana geldi.";
         }
-        
+
+        return View();
+    }
+
+    public IActionResult FacebookLogin(string returnUrl)
+    {
+        var redirectUrl = Url.Action("ExternalResponse", "Home", new { ReturnUrl = returnUrl });
+
+        var property = _signInManager.ConfigureExternalAuthenticationProperties("Facebook", redirectUrl);
+        return new ChallengeResult("Facebook", property);
+    }
+
+    public IActionResult GoogleLogin(string returnUrl)
+    {
+        var redirectUrl = Url.Action("ExternalResponse", "Home", new { ReturnUrl = returnUrl });
+
+        var property = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+        return new ChallengeResult("Google", property);
+    }
+
+
+    public IActionResult MicrosoftLogin(string returnUrl)
+    {
+        var redirectUrl = Url.Action("ExternalResponse", "Home", new { ReturnUrl = returnUrl });
+
+        var property = _signInManager.ConfigureExternalAuthenticationProperties("Microsoft", redirectUrl);
+        return new ChallengeResult("Microsoft", property);
+    }
+
+
+    public async Task<IActionResult> ExternalResponse(string returnUrl = "/")
+    {
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info is null)
+        {
+            return RedirectToAction("Login");
+        }
+        else
+        {
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true);
+            if (result.Succeeded)
+            {
+                return Redirect(returnUrl);
+            }
+            else
+            {
+                var user = new AppUser();
+                var externalUSerId = info.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
+                user.Email = info.Principal.FindFirst(ClaimTypes.Email).Value;
+                user.Id = info.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
+                if (info.Principal.HasClaim(x => x.Type == ClaimTypes.Name))
+                {
+                    var userName = info.Principal.FindFirst(ClaimTypes.Name).Value;
+                    userName = userName.Replace(' ', '-').ToLower() + externalUSerId.Substring(0, 5);
+                    user.UserName = userName;
+                }
+                else
+                {
+                    user.UserName = info.Principal.FindFirst(ClaimTypes.Email).Value;
+                }
+
+                var userExist = await _userManager.FindByEmailAsync(ClaimTypes.Email);
+                if (userExist is null)
+                {
+                    var createResult = await _userManager.CreateAsync(user);
+
+                    if (createResult.Succeeded)
+                    {
+                        var loginResult = await _userManager.AddLoginAsync(user, info);
+                        if (loginResult.Succeeded)
+                        {
+                            await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true);
+                            return Redirect(returnUrl);
+                        }
+                        else
+                        {
+                            AddModelError(loginResult);
+                        }
+                    }
+                    else
+                    {
+                        AddModelError(createResult);
+                    }
+                }
+                else
+                {
+                    var loginResult = await _userManager.AddLoginAsync(userExist, info);
+                    await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true);
+                    return Redirect(returnUrl);
+                }
+            }
+        }
+
+        var errors = ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList();
+        return RedirectToAction("Error", errors);
+    }
+
+    public ActionResult Error()
+    {
         return View();
     }
 }
