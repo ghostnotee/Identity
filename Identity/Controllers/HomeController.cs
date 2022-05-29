@@ -263,7 +263,7 @@ public class HomeController : BaseController
                     var loginResult = await _userManager.AddLoginAsync(user, info);
                     if (loginResult.Succeeded)
                     {
-                        await _signInManager.SignInAsync(user, true);
+                        await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true);
                         return Redirect(returnUrl);
                     }
                     else
@@ -278,6 +278,12 @@ public class HomeController : BaseController
             }
         }
 
-        return RedirectToAction("Error");
+        var errors = ModelState.Values.SelectMany(x => x.Errors).Select(y => y.ErrorMessage).ToList();
+        return RedirectToAction("Error", errors);
+    }
+
+    public ActionResult Error()
+    {
+        return View();
     }
 }
