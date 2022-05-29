@@ -17,10 +17,18 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerExpress"));
 });
 
+//Facebook Login
+builder.Services.AddAuthentication().AddFacebook(opt =>
+{
+    opt.AppId = builder.Configuration.GetValue<string>("Authentication:Facebook:AppId");
+    opt.AppSecret = builder.Configuration.GetValue<string>("Authentication:Facebook:AppSecret");
+});
+
 // Add Identity
 builder.Services.AddIdentity<AppUser, AppRole>(options =>
     {
         options.User.RequireUniqueEmail = true;
+        options.User.AllowedUserNameCharacters = "abcçdefgğhıijklmnoçpqrsştuüvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._";
         options.Password.RequiredLength = 4;
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequireLowercase = false;
