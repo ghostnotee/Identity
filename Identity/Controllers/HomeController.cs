@@ -224,6 +224,23 @@ public class HomeController : BaseController
         return new ChallengeResult("Facebook", property);
     }
 
+    public IActionResult GoogleLogin(string returnUrl)
+    {
+        var redirectUrl = Url.Action("ExternalResponse", "Home", new { ReturnUrl = returnUrl });
+
+        var property = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+        return new ChallengeResult("Google", property);
+    }
+
+
+    public IActionResult MicrosoftLogin(string returnUrl)
+    {
+        var redirectUrl = Url.Action("ExternalResponse", "Home", new { ReturnUrl = returnUrl });
+
+        var property = _signInManager.ConfigureExternalAuthenticationProperties("Microsoft", redirectUrl);
+        return new ChallengeResult("Microsoft", property);
+    }
+
 
     public async Task<IActionResult> ExternalResponse(string returnUrl = "/")
     {
@@ -256,24 +273,34 @@ public class HomeController : BaseController
                     user.UserName = info.Principal.FindFirst(ClaimTypes.Email).Value;
                 }
 
-                var createResult = await _userManager.CreateAsync(user);
-
-                if (createResult.Succeeded)
+                var userExist = await _userManager.FindByEmailAsync(ClaimTypes.Email);
+                if (userExist is null)
                 {
-                    var loginResult = await _userManager.AddLoginAsync(user, info);
-                    if (loginResult.Succeeded)
+                    var createResult = await _userManager.CreateAsync(user);
+
+                    if (createResult.Succeeded)
                     {
-                        await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true);
-                        return Redirect(returnUrl);
+                        var loginResult = await _userManager.AddLoginAsync(user, info);
+                        if (loginResult.Succeeded)
+                        {
+                            await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true);
+                            return Redirect(returnUrl);
+                        }
+                        else
+                        {
+                            AddModelError(loginResult);
+                        }
                     }
                     else
                     {
-                        AddModelError(loginResult);
+                        AddModelError(createResult);
                     }
                 }
                 else
                 {
-                    AddModelError(createResult);
+                    var loginResult = await _userManager.AddLoginAsync(userExist, info);
+                    await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, true);
+                    return Redirect(returnUrl);
                 }
             }
         }
